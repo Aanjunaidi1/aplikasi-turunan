@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Turunan — Kecepatan, Percepatan & Garis Singgung</title>
+
+    <!-- ===== KONFIGURASI MATHJAX ===== -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(0,0,0,.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px;
+            padding: 0; margin: -1px; overflow: hidden;
+            clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo { font-weight: 800; font-size: 1.15rem; color: var(--primary); letter-spacing: -.5px; }
+        .logo span { color: var(--accent); }
+        .header-info { display: flex; gap: 8px; flex-wrap: wrap; }
+        .class-badge {
+            background: #eff6ff;
+            color: var(--primary-dark);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: .85rem;
+            font-weight: 700;
+            border: 1px solid #bfdbfe;
+            white-space: nowrap;
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress-wrap { max-width: 960px; margin: 0 auto; padding: 16px 24px 0; }
+        .progress-bar { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 999px;
+            transition: width .45s cubic-bezier(.4,0,.2,1);
+            width: 0%;
+        }
+        .progress-text { text-align: center; font-size: .8rem; color: var(--text-light); margin-top: 6px; font-weight: 600; }
+
+        /* ===== SLIDE ===== */
+        .slide-container { max-width: 960px; margin: 0 auto; padding: 20px 24px 120px; position: relative; }
+        .slide { display: none; animation: fadeUp .4s ease; }
+        .slide.active { display: block; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .card h2 { font-size: 1.5rem; margin-bottom: 8px; color: var(--primary-dark); }
+        .card h3 { font-size: 1.1rem; margin: 20px 0 10px; color: var(--text); }
+        .card p { margin-bottom: 12px; color: var(--text-light); }
+        .card ul { padding-left: 20px; margin-bottom: 12px; color: var(--text-light); }
+        .card li { margin-bottom: 6px; }
+
+        .tag {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--primary);
+            font-size: .75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        /* ===== FORMULA ===== */
+        .formula {
+            background: #f1f5f9;
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 16px 0;
+            font-size: 1rem;
+            overflow-x: auto;
+        }
+        
+        /* Kotak Penjelasan */
+        .explanation-box {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+        .explanation-box h4 { color: #92400e; margin-bottom: 8px; font-size: 1rem; }
+        .explanation-box ul { margin-bottom: 0; color: #78350f; }
+        .explanation-box li { margin-bottom: 4px; }
+
+        /* ===== NAME INPUT ===== */
+        .name-input-wrap { margin: 18px 0 8px; }
+        .name-input {
+            width: 100%;
+            max-width: 380px;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            font-family: inherit;
+            color: var(--text);
+        }
+        .name-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
+        .name-greeting { font-size: .9rem; color: var(--text-light); margin-top: 8px; min-height: 20px; }
+
+        /* ===== CANVAS & CONTROLS ===== */
+        .canvas-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .canvas-box canvas {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .slider-row { display: flex; align-items: center; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
+        .slider-row label { font-size: .85rem; font-weight: 700; min-width: 120px; color: var(--text); }
+        .slider-row input[type="range"] { flex: 1; accent-color: var(--primary); min-width: 120px; }
+        .slider-row .val {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-dark);
+            min-width: 52px;
+            text-align: right;
+        }
+
+        /* ===== CLASS GRID ===== */
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .class-btn {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 8px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: all .2s;
+            text-align: center;
+            font-family: inherit;
+        }
+        .class-btn:hover { border-color: var(--primary); background: #eff6ff; }
+        .class-btn.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(37,99,235,.35);
+        }
+
+        /* ===== QUIZ ===== */
+        .quiz-block {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .quiz-block .q-text { font-weight: 700; margin-bottom: 12px; color: var(--text); }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-opt {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            text-align: left;
+            cursor: pointer;
+            font-size: .95rem;
+            transition: all .15s;
+            color: var(--text);
+            font-family: inherit;
+        }
+        .quiz-opt:hover:not(:disabled) { border-color: var(--primary); }
+        .quiz-opt.correct {
+            background: #ecfdf5;
+            border-color: var(--success);
+            color: #065f46;
+            font-weight: 700;
+        }
+        .quiz-opt.wrong {
+            background: #fef2f2;
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+        .quiz-opt:disabled { cursor: default; }
+        .quiz-feedback { margin-top: 10px; font-size: .9rem; font-weight: 600; min-height: 24px; }
+        .quiz-feedback.ok { color: var(--success); }
+        .quiz-feedback.no { color: var(--danger); }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: .95rem;
+            border: none;
+            cursor: pointer;
+            transition: all .2s;
+            font-family: inherit;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+        .btn-outline:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+        .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+        /* ===== NAV BAR ===== */
+        .nav-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
+            padding: 14px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 100;
+        }
+        .nav-bar .btn { min-width: 120px; }
+
+        /* ===== PROFILE CREATOR ===== */
+        .profile-creator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 24px 0;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px rgba(37,99,235,.25);
+            letter-spacing: -1px;
+        }
+        .creator-name {
+            font-size: 1.4rem;
+            color: var(--primary-dark);
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -.5px;
+        }
+        .creator-role {
+            font-size: 1.05rem;
+            color: var(--text);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .creator-school {
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: .5px;
+            margin-bottom: 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .card { padding: 22px 18px; }
+            .card h2 { font-size: 1.25rem; }
+            .nav-bar .btn { min-width: 90px; font-size: .85rem; padding: 10px 16px; }
+            .class-grid { grid-template-columns: repeat(3, 1fr); }
+            .slider-row label { min-width: 80px; font-size: .8rem; }
+            .avatar { width: 80px; height: 80px; font-size: 2rem; }
+            .creator-name { font-size: 1.2rem; }
+        }
+
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 16px; }
+        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Aplikasi <span>Turunan</span></div>
+    <div class="header-info">
+        <div class="class-badge" id="nameBadge">Nama: —</div>
+        <div class="class-badge" id="classBadge">Kelas: —</div>
+    </div>
+</header>
+
+<div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Slide 1 dari 10</div>
+</div>
+
+<div class="slide-container" id="slideContainer">
+
+    <!-- ========== SLIDE 1: NAMA + PILIH KELAS ========== -->
+    <section class="slide active" data-slide="0">
+        <div class="card text-center">
+            <span class="tag">Langkah Awal</span>
+            <h2>Selamat Datang 👋</h2>
+            <p>Isi namamu dan pilih kelas <strong>12.1 – 12.7</strong> untuk memulai petualangan turunan.</p>
+
+            <div class="name-input-wrap">
+                <label for="nameInput" class="sr-only">Nama lengkap</label>
+                <input type="text" id="nameInput" class="name-input"
+                       placeholder="Masukkan namamu di sini…"
+                       autocomplete="off" maxlength="40">
+                <p class="name-greeting" id="nameGreeting"></p>
+            </div>
+
+            <h3>Pilih Kelas</h3>
+            <div class="class-grid" id="classGrid">
+                <button class="class-btn" data-kelas="12.1">12.1</button>
+                <button class="class-btn" data-kelas="12.2">12.2</button>
+                <button class="class-btn" data-kelas="12.3">12.3</button>
+                <button class="class-btn" data-kelas="12.4">12.4</button>
+                <button class="class-btn" data-kelas="12.5">12.5</button>
+                <button class="class-btn" data-kelas="12.6">12.6</button>
+                <button class="class-btn" data-kelas="12.7">12.7</button>
+            </div>
+
+            <div class="flex" style="justify-content:center; margin-top:16px;">
+                <button class="btn btn-primary" id="btnStart" disabled>Mulai Belajar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 2: CAPAIAN ========== -->
+    <section class="slide" data-slide="1">
+        <div class="card">
+            <span class="tag">Orientasi</span>
+            <h2>Capaian Pembelajaran & Peta Materi</h2>
+            <p><strong>Capaian:</strong> Peserta didik mampu menggunakan turunan untuk menentukan kecepatan, percepatan, dan persamaan garis singgung kurva, serta menginterpretasikan maknanya dalam konteks nyata.</p>
+            <h3>Dimensi Profil Lulusan</h3>
+            <div class="flex">
+                <span class="tag" style="background:#fef3c7; color:#92400e;">Penalaran Kritis</span>
+                <span class="tag" style="background:#dbeafe; color:#1e40af;">Kreativitas</span>
+                <span class="tag" style="background:#dcfce7; color:#166534;">Kemandirian</span>
+                <span class="tag" style="background:#fce7f3; color:#9d174d;">Komunikasi</span>
+            </div>
+            <h3>Peta Materi</h3>
+            <ul>
+                <li>Asesmen Awal</li>
+                <li>Konsep Turunan &amp; Notasi</li>
+                <li>Kecepatan &amp; Percepatan (Kinematika)</li>
+                <li>Garis Singgung Kurva</li>
+                <li>Laboratorium Interaktif</li>
+                <li>Kuis Akhir (10 Soal)</li>
+                <li>Refleksi</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 3: ASESMEN AWAL ========== -->
+    <section class="slide" data-slide="2">
+        <div class="card">
+            <span class="tag">Asesmen Awal</span>
+            <h2>Seberapa Siap Kamu?</h2>
+            <p>Jawab pertanyaan berikut untuk mengukur kesiapanmu. Tidak ada penilaian—ini hanya pemanasan.</p>
+
+            <div class="quiz-block" data-q="0">
+                <div class="q-text">1. Turunan pertama dari \(f(x)=x^2\) adalah …</div>
+                <div class="quiz-options">
+                    <button class="quiz-opt" data-ans="0">\(x\)</button>
+                    <button class="quiz-opt" data-ans="1">\(2x\)</button>
+                    <button class="quiz-opt" data-ans="0">\(x^2\)</button>
+                </div>
+                <div class="quiz-feedback"></div>
+            </div>
+
+            <div class="quiz-block" data-q="1">
+                <div class="q-text">2. Jika \(s(t)\) adalah posisi terhadap waktu, maka \(s'(t)\) menyatakan …</div>
+                <div class="quiz-options">
+                    <button class="quiz-opt" data-ans="0">Percepatan</button>
+                    <button class="quiz-opt" data-ans="1">Kecepatan</button>
+                    <button class="quiz-opt" data-ans="0">Jarak total</button>
+                </div>
+                <div class="quiz-feedback"></div>
+            </div>
+
+            <div class="quiz-block" data-q="2">
+                <div class="q-text">3. Gradien garis singgung kurva \(y=f(x)\) di \(x=a\) sama dengan …</div>
+                <div class="quiz-options">
+                    <button class="quiz-opt" data-ans="1">\(f'(a)\)</button>
+                    <button class="quiz-opt" data-ans="0">\(f(a)\)</button>
+                    <button class="quiz-opt" data-ans="0">\(a\)</button>
+                </div>
+                <div class="quiz-feedback"></div>
+            </div>
+
+            <div class="quiz-block" data-q="3">
+                <div class="q-text">4. Turunan dari \(f(x)=3x^2-5x\) adalah …</div>
+                <div class="quiz-options">
+                    <button class="quiz-opt" data-ans="0">\(6x-5x\)</button>
+                    <button class="quiz-opt" data-ans="1">\(6x-5\)</button>
+                    <button class="quiz-opt" data-ans="0">\(3x-5\)</button>
+                </div>
+                <div class="quiz-feedback"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 4: KONSEP TURUNAN ========== -->
+    <section class="slide" data-slide="3">
+        <div class="card">
+            <span class="tag">Konsep Dasar</span>
+            <h2>Turunan sebagai Laju Perubahan</h2>
+            <p>Turunan mengukur <strong>seberapa cepat suatu besaran berubah</strong> ketika variabelnya berubah. Secara geometris, turunan di suatu titik adalah <strong>gradien garis singgung</strong> di titik itu.</p>
+            <div class="formula">
+                \[
+                f'(x) = \lim_{h \to 0} \frac{f(x+h)-f(x)}{h}
+                \]
+            </div>
+            <p>Notasi lain: \(\frac{dy}{dx}\), \(y'\), atau \(D_x f(x)\).</p>
+            <h3>Aturan Turunan yang Sering Digunakan</h3>
+            <div class="formula">
+                \[
+                \begin{aligned}
+                &\frac{d}{dx}(x^n) = n x^{n-1} \\
+                &\frac{d}{dx}(c) = 0 \\
+                &\frac{d}{dx}(f+g) = f' + g'
+                \end{aligned}
+                \]
+            </div>
+            <p>Contoh: \(f(x)=4x^3-2x^2+7x-1 \implies f'(x)=12x^2-4x+7\).</p>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 5: KECEPATAN & PERCEPATAN ========== -->
+    <section class="slide" data-slide="4">
+        <div class="card">
+            <span class="tag">Aplikasi 1</span>
+            <h2>Kecepatan &amp; Percepatan</h2>
+            <p>Dalam kinematika, jika \(s(t)\) menyatakan posisi benda pada waktu \(t\), maka:</p>
+            <div class="formula">
+                \[
+                \begin{aligned}
+                v(t) &= s'(t) = \frac{ds}{dt} \quad \text{(kecepatan)} \\
+                a(t) &= v'(t) = s''(t) = \frac{d^2s}{dt^2} \quad \text{(percepatan)}
+                \end{aligned}
+                \]
+            </div>
+            <p>Kecepatan adalah <strong>laju perubahan posisi</strong>; percepatan adalah <strong>laju perubahan kecepatan</strong>.</p>
+
+            <h3>Contoh Soal</h3>
+            <p>Posisi sebuah partikel diberikan oleh \(s(t)=t^3-6t^2+9t+2\) meter, dengan \(t\) dalam detik. Tentukan:</p>
+            <ul>
+                <li>\(v(t)\) dan \(a(t)\)</li>
+                <li>Kecepatan saat \(t=2\) s</li>
+                <li>Percepatan saat \(t=1\) s</li>
+            </ul>
+            <p><strong>Penyelesaian:</strong></p>
+            <div class="formula">
+                \[
+                \begin{aligned}
+                v(t) &= 3t^2-12t+9 \\
+                a(t) &= 6t-12 \\
+                v(2) &= 3(4)-12(2)+9 = 12-24+9 = -3 \text{ m/s} \\
+                a(1) &= 6(1)-12 = -6 \text{ m/s}^2
+                \end{aligned}
+                \]
+            </div>
+            <p>Tanda negatif pada kecepatan menunjukkan arah gerak berlawanan dengan arah positif yang dipilih.</p>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 6: LAB KINEMATIKA ========== -->
+    <section class="slide" data-slide="5">
+        <div class="card">
+            <span class="tag">Laboratorium Interaktif</span>
+            <h2>Eksplorasi: Posisi, Kecepatan, Percepatan</h2>
+            <p>Grafik di bawah menampilkan fungsi posisi \(s(t)=t^3-6t^2+9t+2\). Geser slider waktu \(t\) untuk melihat posisi (titik biru), kecepatan (kemiringan garis singgung), dan percepatan.</p>
+            <div class="canvas-box">
+                <canvas id="kinCanvas" width="640" height="360"></canvas>
+            </div>
+            <div class="slider-row">
+                <label for="kinT">Waktu \(t\) (s)</label>
+                <input type="range" id="kinT" min="0" max="5" step="0.05" value="1">
+                <span class="val" id="kinTVal">1.00</span>
+            </div>
+            <div class="formula" style="font-size:.92rem;">
+                <div>Posisi \(s(t)\) = <span id="kinS">—</span> m</div>
+                <div>Kecepatan \(v(t)=s'(t)\) = <span id="kinV">—</span> m/s</div>
+                <div>Percepatan \(a(t)=s''(t)\) = <span id="kinA">—</span> m/s²</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 7: GARIS SINGGUNG ========== -->
+    <section class="slide" data-slide="6">
+        <div class="card">
+            <span class="tag">Aplikasi 2</span>
+            <h2>Garis Singgung Kurva</h2>
+            <p>Gradien garis singgung kurva \(y=f(x)\) di titik \(x=a\) adalah \(m=f'(a)\). Persamaan garis singgungnya dapat dituliskan sebagai:</p>
+            
+            <div class="formula">
+                \[
+                y - b = m(x - a)
+                \]
+            </div>
+
+            <div class="explanation-box">
+                <h4>💡 Penjelasan Komponen:</h4>
+                <ul>
+                    <li>\((a, b)\) adalah <strong>titik singgung</strong> pada kurva. Nilai \(a\) adalah absis (sumbu-x) dan \(b = f(a)\) adalah ordinat (sumbu-y).</li>
+                    <li>\(m\) adalah <strong>gradien</strong> (kemiringan) garis singgung, yang nilainya sama dengan turunan pertama di titik tersebut, yaitu \(m = f'(a)\).</li>
+                    <li>Notasi ini sama persis dengan rumus persamaan garis lurus yang sudah kamu pelajari sebelumnya: \(y - y_1 = m(x - x_1)\).</li>
+                </ul>
+            </div>
+
+            <h3>Contoh Soal</h3>
+            <p>Tentukan persamaan garis singgung kurva \(f(x)=x^2-4x+3\) di titik dengan absis \(x=3\).</p>
+            <p><strong>Penyelesaian:</strong></p>
+            <ul>
+                <li>Substitusi \(x=3\) ke fungsi untuk mencari ordinat: \(b = f(3) = 9 - 12 + 3 = 0\). Jadi titik singgungnya adalah \((a,b) = (3,0)\).</li>
+                <li>Cari gradien dengan turunan: \(f'(x) = 2x - 4 \implies m = f'(3) = 6 - 4 = 2\).</li>
+                <li>Masukkan ke rumus \(y - b = m(x - a)\):<br> \(y - 0 = 2(x - 3)\)<br> \(y = 2x - 6\).</li>
+            </ul>
+
+            <h3>Eksplorasi Garis Singgung</h3>
+            <p>Geser slider untuk memindahkan titik singgung pada kurva. Perhatikan bagaimana gradien berubah.</p>
+            <div class="canvas-box">
+                <canvas id="tanCanvas" width="640" height="360"></canvas>
+            </div>
+            <div class="slider-row">
+                <label for="tanX">Titik singgung \(x=a\)</label>
+                <input type="range" id="tanX" min="-1" max="5" step="0.05" value="2">
+                <span class="val" id="tanXVal">2.00</span>
+            </div>
+            <div class="formula" style="font-size:.92rem;">
+                <div>Titik singgung \((a,b)\): (<span id="tanA">—</span>, <span id="tanFA">—</span>)</div>
+                <div>Gradien \(m=f'(a)\) = <span id="tanM">—</span></div>
+                <div>Persamaan garis singgung: <span id="tanEq">—</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 8: KUIS AKHIR ========== -->
+    <section class="slide" data-slide="7">
+        <div class="card">
+            <span class="tag">Kuis Akhir</span>
+            <h2>Uji Pemahamanmu</h2>
+            <p id="quizIntro">Soal berikut disesuaikan dengan kelas <strong id="quizKelasLabel">—</strong>.</p>
+            <div id="quizContainer"></div>
+            <div class="flex mt-2">
+                <button class="btn btn-primary" id="btnCheckQuiz">Periksa Jawaban</button>
+                <button class="btn btn-outline" id="btnResetQuiz">Ulangi</button>
+            </div>
+            <div id="quizResult" class="mt-2" style="font-weight:700;"></div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 9: REFLEKSI ========== -->
+    <section class="slide" data-slide="8">
+        <div class="card text-center">
+            <span class="tag">Penutup</span>
+            <h2>Refleksi</h2>
+            <p>Konsep turunan menghubungkan <strong>aljabar</strong>, <strong>geometri</strong>, dan <strong>fisika</strong>:</p>
+            <div class="formula" style="text-align:left;">
+                <div>🔹 Turunan = laju perubahan = gradien garis singgung</div>
+                <div>🔹 \(s(t) \xrightarrow{\text{turunan}} v(t) \xrightarrow{\text{turunan}} a(t)\)</div>
+                <div>🔹 Garis singgung: \(y - b = m(x - a)\)</div>
+            </div>
+            <p>Gunakan pemahaman ini untuk menyelesaikan masalah nyata, bukan sekadar menghafal rumus.</p>
+            <div class="flex" style="justify-content:center; margin-top:20px;">
+                <button class="btn btn-outline" id="btnRestart">Kembali ke Awal</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SLIDE 10: PROFIL PEMBUAT ========== -->
+    <section class="slide" data-slide="9">
+        <div class="card text-center">
+            <span class="tag">Profil Pembuat</span>
+            <h2>Tentang Pembuat</h2>
+            
+            <div class="profile-creator">
+                <div class="avatar">YU</div>
+                <h3 class="creator-name">Yuswita Utami, S.Si., Gr.</h3>
+                <p class="creator-role">Guru Matematika</p>
+                <p class="creator-school">MAN 3 PALEMBANG</p>
+            </div>
+            
+            <p class="mt-2" style="font-size: 0.95rem;">Terima kasih telah menggunakan media pembelajaran interaktif ini. Semoga bermanfaat untuk memahami konsep aplikasi turunan!</p>
+        </div>
+    </section>
+
+</div>
+
+<!-- ========== NAVIGASI ========== -->
+<div class="nav-bar">
+    <button class="btn btn-outline" id="btnPrev" disabled>← Sebelumnya</button>
+    <button class="btn btn-primary" id="btnNext">Selanjutnya →</button>
+</div>
+
+<script>
+/* ============================================================
+   STATE & UTILITAS
+   ============================================================ */
+const state = {
+    slideIndex: 0,
+    totalSlides: 10, // Diperbarui menjadi 10
+    kelas: null,
+    nama: '',
+    quizAnswered: new Set()
+};
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+function typesetMath(el) {
+    if (!window.MathJax) return;
+    const target = el ? [el] : undefined;
+    const run = () => MathJax.typesetPromise(target).catch(err => console.warn('MathJax:', err));
+    if (MathJax.startup && MathJax.startup.promise) {
+        MathJax.startup.promise.then(run).catch(() => {});
+    } else if (MathJax.typesetPromise) {
+        run();
+    }
+}
+
+function updateProgress() {
+    const pct = ((state.slideIndex + 1) / state.totalSlides) * 100;
+    $('#progressFill').style.width = pct + '%';
+    $('#progressText').textContent = `Slide ${state.slideIndex + 1} dari ${state.totalSlides}`;
+}
+
+function showSlide(idx) {
+    state.slideIndex = Math.max(0, Math.min(idx, state.totalSlides - 1));
+    $$('.slide').forEach((s, i) => s.classList.toggle('active', i === state.slideIndex));
+    updateProgress();
+    $('#btnPrev').disabled = state.slideIndex === 0;
+    const nextBtn = $('#btnNext');
+    if (state.slideIndex === state.totalSlides - 1) {
+        nextBtn.textContent = 'Selesai';
+        nextBtn.disabled = true;
+    } else {
+        nextBtn.textContent = 'Selanjutnya →';
+        nextBtn.disabled = false;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const active = $('.slide.active');
+    if (active) typesetMath(active);
+}
+
+/* ============================================================
+   PEMILIHAN NAMA & KELAS
+   ============================================================ */
+function validateStart() {
+    const nameOk = state.nama.length > 0;
+    $('#btnStart').disabled = !(nameOk && state.kelas);
+}
+
+function initClassSelection() {
+    const grid = $('#classGrid');
+    const nameInput = $('#nameInput');
+    const nameGreeting = $('#nameGreeting');
+    const nameBadge = $('#nameBadge');
+    const btnStart = $('#btnStart');
+
+    nameInput.addEventListener('input', () => {
+        state.nama = nameInput.value.trim();
+        nameBadge.textContent = 'Nama: ' + (state.nama || '—');
+        nameGreeting.textContent = state.nama
+            ? `Halo, ${state.nama}! Silakan pilih kelasmu di bawah.`
+            : '';
+        validateStart();
+    });
+
+    grid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.class-btn');
+        if (!btn) return;
+        $$('.class-btn', grid).forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.kelas = btn.dataset.kelas;
+        $('#classBadge').textContent = `Kelas: ${state.kelas}`;
+        validateStart();
+        renderQuizForClass();
+    });
+
+    btnStart.addEventListener('click', () => {
+        if (!state.kelas || !state.nama) return;
+        showSlide(1);
+    });
+}
+
+/* ============================================================
+   NAVIGASI
+   ============================================================ */
+function initNav() {
+    $('#btnPrev').addEventListener('click', () => showSlide(state.slideIndex - 1));
+    $('#btnNext').addEventListener('click', () => {
+        if (state.slideIndex < state.totalSlides - 1) showSlide(state.slideIndex + 1);
+    });
+    $('#btnRestart').addEventListener('click', () => {
+        showSlide(0);
+        state.kelas = null;
+        state.nama = '';
+        $('#nameInput').value = '';
+        $('#nameGreeting').textContent = '';
+        $('#nameBadge').textContent = 'Nama: —';
+        $('#classBadge').textContent = 'Kelas: —';
+        $$('.class-btn').forEach(b => b.classList.remove('selected'));
+        $('#btnStart').disabled = true;
+    });
+}
+
+/* ============================================================
+   LAB KINEMATIKA
+   ============================================================ */
+const kinCanvas = $('#kinCanvas');
+const kinCtx = kinCanvas.getContext('2d');
+const KIN = { w: 640, h: 360, pad: 48 };
+
+const sKin = (t) => t * t * t - 6 * t * t + 9 * t + 2;
+const vKin = (t) => 3 * t * t - 12 * t + 9;
+const aKin = (t) => 6 * t - 12;
+
+function drawKinematics(t) {
+    const { w, h, pad } = KIN;
+    kinCtx.clearRect(0, 0, w, h);
+
+    const tMin = 0, tMax = 5;
+    const sMin = -2, sMax = 10;
+    const xPix = (tt) => pad + (tt - tMin) / (tMax - tMin) * (w - 2 * pad);
+    const yPix = (s) => h - pad - (s - sMin) / (sMax - sMin) * (h - 2 * pad);
+
+    kinCtx.strokeStyle = '#e2e8f0';
+    kinCtx.lineWidth = 1;
+    for (let s = sMin; s <= sMax; s += 2) {
+        kinCtx.beginPath(); kinCtx.moveTo(pad, yPix(s)); kinCtx.lineTo(w - pad, yPix(s)); kinCtx.stroke();
+        kinCtx.fillStyle = '#94a3b8'; kinCtx.font = '11px system-ui'; kinCtx.textAlign = 'right';
+        kinCtx.fillText(s, pad - 6, yPix(s) + 4);
+    }
+    for (let tt = tMin; tt <= tMax; tt += 1) {
+        kinCtx.beginPath(); kinCtx.moveTo(xPix(tt), pad); kinCtx.lineTo(xPix(tt), h - pad); kinCtx.stroke();
+        kinCtx.fillStyle = '#94a3b8'; kinCtx.textAlign = 'center';
+        kinCtx.fillText(tt, xPix(tt), h - pad + 18);
+    }
+
+    kinCtx.strokeStyle = '#94a3b8'; kinCtx.lineWidth = 1.5;
+    kinCtx.beginPath(); kinCtx.moveTo(pad, pad); kinCtx.lineTo(pad, h - pad); kinCtx.lineTo(w - pad, h - pad); kinCtx.stroke();
+
+    kinCtx.fillStyle = '#64748b'; kinCtx.font = '12px system-ui'; kinCtx.textAlign = 'center';
+    kinCtx.fillText('t (s)', w / 2, h - 8);
+    kinCtx.save(); kinCtx.translate(14, h / 2); kinCtx.rotate(-Math.PI / 2); kinCtx.fillText('s (m)', 0, 0); kinCtx.restore();
+
+    kinCtx.beginPath(); kinCtx.strokeStyle = '#2563eb'; kinCtx.lineWidth = 2.5;
+    for (let i = 0; i <= 300; i++) {
+        const tt = tMin + (i / 300) * (tMax - tMin);
+        const ss = sKin(tt);
+        if (i === 0) kinCtx.moveTo(xPix(tt), yPix(ss));
+        else kinCtx.lineTo(xPix(tt), yPix(ss));
+    }
+    kinCtx.stroke();
+
+    const s0 = sKin(t);
+    kinCtx.beginPath(); kinCtx.arc(xPix(t), yPix(s0), 6, 0, Math.PI * 2);
+    kinCtx.fillStyle = '#2563eb'; kinCtx.fill();
+    kinCtx.strokeStyle = '#fff'; kinCtx.lineWidth = 2; kinCtx.stroke();
+
+    const m = vKin(t);
+    const dt = 0.6;
+    const t1 = t - dt, t2 = t + dt;
+    const s1 = s0 + m * (t1 - t);
+    const s2 = s0 + m * (t2 - t);
+    kinCtx.beginPath(); kinCtx.strokeStyle = '#f59e0b'; kinCtx.lineWidth = 2; kinCtx.setLineDash([6, 4]);
+    kinCtx.moveTo(xPix(t1), yPix(s1)); kinCtx.lineTo(xPix(t2), yPix(s2)); kinCtx.stroke();
+    kinCtx.setLineDash([]);
+
+    $('#kinTVal').textContent = t.toFixed(2);
+    $('#kinS').textContent = s0.toFixed(2);
+    $('#kinV').textContent = m.toFixed(2);
+    $('#kinA').textContent = aKin(t).toFixed(2);
+}
+
+function initKinematicsLab() {
+    const slider = $('#kinT');
+    slider.addEventListener('input', () => drawKinematics(parseFloat(slider.value)));
+    drawKinematics(1);
+}
+
+/* ============================================================
+   LAB GARIS SINGGUNG
+   ============================================================ */
+const tanCanvas = $('#tanCanvas');
+const tanCtx = tanCanvas.getContext('2d');
+const TAN = { w: 640, h: 360, pad: 48 };
+
+const fTan = (x) => x * x - 4 * x + 3;
+const dfTan = (x) => 2 * x - 4;
+
+function drawTangent(a) {
+    const { w, h, pad } = TAN;
+    tanCtx.clearRect(0, 0, w, h);
+
+    const xMin = -2, xMax = 6;
+    const yMin = -4, yMax = 14;
+    const xPix = (x) => pad + (x - xMin) / (xMax - xMin) * (w - 2 * pad);
+    const yPix = (y) => h - pad - (y - yMin) / (yMax - yMin) * (h - 2 * pad);
+
+    tanCtx.strokeStyle = '#e2e8f0'; tanCtx.lineWidth = 1;
+    for (let y = -4; y <= 14; y += 3) {
+        tanCtx.beginPath(); tanCtx.moveTo(pad, yPix(y)); tanCtx.lineTo(w - pad, yPix(y)); tanCtx.stroke();
+        tanCtx.fillStyle = '#94a3b8'; tanCtx.font = '11px system-ui'; tanCtx.textAlign = 'right';
+        tanCtx.fillText(y, pad - 6, yPix(y) + 4);
+    }
+    for (let x = -2; x <= 6; x += 1) {
+        tanCtx.beginPath(); tanCtx.moveTo(xPix(x), pad); tanCtx.lineTo(xPix(x), h - pad); tanCtx.stroke();
+        tanCtx.fillStyle = '#94a3b8'; tanCtx.textAlign = 'center';
+        tanCtx.fillText(x, xPix(x), h - pad + 18);
+    }
+
+    tanCtx.strokeStyle = '#94a3b8'; tanCtx.lineWidth = 1.5;
+    tanCtx.beginPath(); tanCtx.moveTo(pad, pad); tanCtx.lineTo(pad, h - pad); tanCtx.lineTo(w - pad, h - pad); tanCtx.stroke();
+    tanCtx.fillStyle = '#64748b'; tanCtx.font = '12px system-ui'; tanCtx.textAlign = 'center';
+    tanCtx.fillText('x', w / 2, h - 8);
+    tanCtx.save(); tanCtx.translate(14, h / 2); tanCtx.rotate(-Math.PI / 2); tanCtx.fillText('y', 0, 0); tanCtx.restore();
+
+    tanCtx.beginPath(); tanCtx.strokeStyle = '#2563eb'; tanCtx.lineWidth = 2.5;
+    for (let i = 0; i <= 400; i++) {
+        const x = xMin + (i / 400) * (xMax - xMin);
+        const y = fTan(x);
+        if (i === 0) tanCtx.moveTo(xPix(x), yPix(y));
+        else tanCtx.lineTo(xPix(x), yPix(y));
+    }
+    tanCtx.stroke();
+
+    const fa = fTan(a);
+    const m = dfTan(a);
+    tanCtx.beginPath(); tanCtx.arc(xPix(a), yPix(fa), 6, 0, Math.PI * 2);
+    tanCtx.fillStyle = '#ef4444'; tanCtx.fill();
+    tanCtx.strokeStyle = '#fff'; tanCtx.lineWidth = 2; tanCtx.stroke();
+
+    const y1 = fa + m * (xMin - a);
+    const y2 = fa + m * (xMax - a);
+    tanCtx.beginPath(); tanCtx.strokeStyle = '#f59e0b'; tanCtx.lineWidth = 2; tanCtx.setLineDash([8, 5]);
+    tanCtx.moveTo(xPix(xMin), yPix(y1)); tanCtx.lineTo(xPix(xMax), yPix(y2)); tanCtx.stroke();
+    tanCtx.setLineDash([]);
+
+    $('#tanXVal').textContent = a.toFixed(2);
+    $('#tanA').textContent = a.toFixed(2);
+    $('#tanFA').textContent = fa.toFixed(2);
+    $('#tanM').textContent = m.toFixed(2);
+    const c = fa - m * a;
+    $('#tanEq').textContent = `y = ${m.toFixed(2)}x ${c >= 0 ? '+' : '−'} ${Math.abs(c).toFixed(2)}`;
+}
+
+function initTangentLab() {
+    const slider = $('#tanX');
+    slider.addEventListener('input', () => drawTangent(parseFloat(slider.value)));
+    drawTangent(2);
+}
+
+/* ============================================================
+   KUIS DINAMIS PER KELAS (10 SOAL PER KELAS)
+   ============================================================ */
+const bankSoal = {
+    "12.1": [
+        { t: "Turunan pertama dari \\(f(x)=x^2\\) adalah …", o: ["\\(x\\)", "\\(2x\\)", "\\(x^2\\)"], a: 1 },
+        { t: "Jika \\(s(t)=2t^3-3t^2+4t\\), maka \\(v(t)=s'(t)\\) adalah …", o: ["\\(6t^2-6t+4\\)", "\\(2t^2-3t+4\\)", "\\(6t^2-3t+4\\)"], a: 0 },
+        { t: "Turunan kedua dari \\(f(x)=x^3-3x^2+2x\\) adalah …", o: ["\\(6x-6\\)", "\\(3x^2-6x+2\\)", "\\(6x-3\\)"], a: 0 },
+        { t: "Gradien garis singgung \\(y=x^2\\) di \\(x=3\\) adalah …", o: ["6", "3", "9"], a: 0 },
+        { t: "Turunan dari \\(f(x)=5x^4\\) adalah …", o: ["\\(20x^3\\)", "\\(5x^3\\)", "\\(20x^4\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=3x^2+2x-1\\) adalah …", o: ["\\(6x+2\\)", "\\(3x+2\\)", "\\(6x-1\\)"], a: 0 },
+        { t: "Turunan dari fungsi konstan \\(f(x)=7\\) adalah …", o: ["7", "1", "0"], a: 2 },
+        { t: "Jika \\(s(t)=t^2-4t\\), maka \\(v(t)\\) adalah …", o: ["\\(2t-4\\)", "\\(t-4\\)", "\\(2t+4\\)"], a: 0 },
+        { t: "Nilai \\(f'(2)\\) jika \\(f(x)=x^3\\) adalah …", o: ["6", "8", "12"], a: 2 },
+        { t: "Gradien garis singgung \\(y=2x^2-3x\\) di \\(x=1\\) adalah …", o: ["1", "2", "3"], a: 0 }
+    ],
+    "12.2": [
+        { t: "Posisi partikel \\(s(t)=t^2-4t+5\\). Kecepatan saat \\(t=3\\) adalah …", o: ["2 m/s", "3 m/s", "5 m/s"], a: 0 },
+        { t: "Percepatan adalah turunan … dari posisi.", o: ["pertama", "kedua", "ketiga"], a: 1 },
+        { t: "Persamaan garis singgung \\(f(x)=x^2-2x+1\\) di \\(x=2\\) adalah …", o: ["\\(y=2x-3\\)", "\\(y=2x+1\\)", "\\(y=x-1\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=4x^3\\) adalah …", o: ["\\(12x^2\\)", "\\(4x^2\\)", "\\(12x^3\\)"], a: 0 },
+        { t: "Jika \\(s(t)=t^3-6t^2\\), maka \\(v(t)\\) adalah …", o: ["\\(3t^2-12t\\)", "\\(3t^2-6t\\)", "\\(t^2-12t\\)"], a: 0 },
+        { t: "Jika \\(v(t)=6t-4\\), maka percepatan \\(a(t)\\) adalah …", o: ["6", "\\(6t\\)", "4"], a: 0 },
+        { t: "Turunan dari \\(f(x)=2x^2+5\\) adalah …", o: ["\\(4x\\)", "\\(2x\\)", "\\(4x+5\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=-3x^2\\) adalah …", o: ["\\(-6x\\)", "\\(-3x\\)", "\\(6x\\)"], a: 0 },
+        { t: "Posisi \\(s(t)=5t^2\\). Kecepatan saat \\(t=2\\) adalah …", o: ["20", "10", "25"], a: 0 },
+        { t: "Persamaan garis singgung \\(y=x^2\\) di \\(x=-1\\) adalah …", o: ["\\(y=-2x-1\\)", "\\(y=2x+1\\)", "\\(y=-2x+1\\)"], a: 0 }
+    ],
+    "12.3": [
+        { t: "Jika \\(f(x)=4x^2-3x\\), maka \\(f'(2)\\) adalah …", o: ["13", "10", "16"], a: 0 },
+        { t: "Sebuah benda bergerak dengan \\(v(t)=3t^2-2t\\). Percepatan saat \\(t=2\\) adalah …", o: ["10 m/s²", "8 m/s²", "12 m/s²"], a: 0 },
+        { t: "Garis singgung kurva \\(y=x^3\\) di \\(x=1\\) memiliki gradien …", o: ["3", "1", "2"], a: 0 },
+        { t: "Turunan dari \\(f(x)=(x+1)(x-1)\\) adalah …", o: ["\\(2x\\)", "\\(x^2-1\\)", "\\(2x-1\\)"], a: 0 },
+        { t: "Jika \\(s(t)=t^3-t\\), maka \\(v(t)\\) adalah …", o: ["\\(3t^2-1\\)", "\\(3t^2-t\\)", "\\(t^2-1\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=2x^3-x^2\\) adalah …", o: ["\\(6x^2-2x\\)", "\\(6x^3-2x\\)", "\\(2x^2-2x\\)"], a: 0 },
+        { t: "Jika \\(s(t)=2t^2+3t\\), maka percepatan \\(a(t)\\) adalah …", o: ["4", "\\(4t\\)", "3"], a: 0 },
+        { t: "Nilai \\(f'(-1)\\) jika \\(f(x)=x^2+x\\) adalah …", o: ["-1", "1", "-3"], a: 0 },
+        { t: "Gradien garis singgung \\(y=3x^2\\) di \\(x=2\\) adalah …", o: ["12", "6", "9"], a: 0 },
+        { t: "Nilai \\(f'(1)\\) jika \\(f(x)=x^3-2x\\) adalah …", o: ["1", "3", "-1"], a: 0 }
+    ],
+    "12.4": [
+        { t: "Turunan dari \\(f(x)=(x^2+1)(x-2)\\) adalah …", o: ["\\(3x^2-4x+1\\)", "\\(2x^2-4x+1\\)", "\\(3x^2-2x+1\\)"], a: 0 },
+        { t: "Posisi \\(s(t)=t^3-3t\\). Percepatan saat \\(t=2\\) adalah …", o: ["12 m/s²", "6 m/s²", "9 m/s²"], a: 0 },
+        { t: "Garis singgung \\(y=x^2+1\\) di \\(x=-1\\) adalah …", o: ["\\(y=-2x\\)", "\\(y=2x+2\\)", "\\(y=-2x+2\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=(2x-1)^2\\) adalah …", o: ["\\(8x-4\\)", "\\(4x-2\\)", "\\(8x-2\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=(x+3)^2\\) adalah …", o: ["\\(2x+6\\)", "\\(2x+3\\)", "\\(x+6\\)"], a: 0 },
+        { t: "Jika \\(s(t)=(t-1)^2\\), maka \\(v(t)\\) adalah …", o: ["\\(2t-2\\)", "\\(2t-1\\)", "\\(t-1\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=x^4-2x^2\\) adalah …", o: ["\\(4x^3-4x\\)", "\\(4x^3-2x\\)", "\\(x^3-4x\\)"], a: 0 },
+        { t: "Jika \\(v(t)=2t^3\\), maka percepatan \\(a(t)\\) adalah …", o: ["\\(6t^2\\)", "\\(2t^2\\)", "\\(6t\\)"], a: 0 },
+        { t: "Gradien garis singgung \\(y=x^3\\) di \\(x=-2\\) adalah …", o: ["12", "-12", "8"], a: 0 },
+        { t: "Nilai \\(f'(2)\\) jika \\(f(x)=3x^2-2x+1\\) adalah …", o: ["10", "12", "8"], a: 0 }
+    ],
+    "12.5": [
+        { t: "Jika \\(v(t)=6t-4\\), maka posisi \\(s(t)\\) yang mungkin adalah …", o: ["\\(3t^2-4t+C\\)", "\\(6t^2-4t\\)", "\\(3t^2+4t\\)"], a: 0 },
+        { t: "Percepatan konstan \\(a=4\\). Jika \\(v(0)=2\\), maka \\(v(3)\\) adalah …", o: ["14", "12", "10"], a: 0 },
+        { t: "Gradien garis normal kurva \\(y=x^2\\) di \\(x=1\\) adalah …", o: ["\\(-1/2\\)", "2", "\\(-2\\)"], a: 0 },
+        { t: "Jika \\(s(t)=4t^3\\), maka \\(v(t)\\) adalah …", o: ["\\(12t^2\\)", "\\(4t^2\\)", "\\(12t^3\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=-2x^3\\) adalah …", o: ["\\(-6x^2\\)", "\\(6x^2\\)", "\\(-2x^2\\)"], a: 0 },
+        { t: "Jika \\(s(t)=t^2+2t+1\\), maka percepatan \\(a(t)\\) adalah …", o: ["2", "\\(2t\\)", "1"], a: 0 },
+        { t: "Turunan dari fungsi konstan \\(f(x)=5\\) adalah …", o: ["0", "5", "1"], a: 0 },
+        { t: "Gradien garis singgung \\(y=2x^2\\) di \\(x=1\\) adalah …", o: ["4", "2", "8"], a: 0 },
+        { t: "Nilai \\(f'(0)\\) jika \\(f(x)=x^3+x\\) adalah …", o: ["1", "0", "3"], a: 0 },
+        { t: "Jika \\(v(t)=3t^2\\), maka percepatan saat \\(t=1\\) adalah …", o: ["6", "3", "0"], a: 0 }
+    ],
+    "12.6": [
+        { t: "Turunan \\(f(x)=\\frac{1}{x}\\) di \\(x=2\\) adalah …", o: ["\\(-1/4\\)", "\\(1/4\\)", "\\(-1/2\\)"], a: 0 },
+        { t: "Posisi \\(s(t)=t^4-2t^2\\). Kecepatan saat \\(t=1\\) adalah …", o: ["0", "2", "4"], a: 0 },
+        { t: "Garis singgung \\(y=\\sqrt{x}\\) di \\(x=4\\) adalah …", o: ["\\(y=\\frac{1}{4}x+1\\)", "\\(y=\\frac{1}{2}x+2\\)", "\\(y=2x-4\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=x^{-2}\\) adalah …", o: ["\\(-2x^{-3}\\)", "\\(2x^{-1}\\)", "\\(-2x^{-2}\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=\\sqrt{x}\\) adalah …", o: ["\\(\\frac{1}{2\\sqrt{x}}\\)", "\\(2\\sqrt{x}\\)", "\\(\\frac{1}{\\sqrt{x}}\\)"], a: 0 },
+        { t: "Jika \\(s(t)=\\sqrt{t}\\), maka \\(v(t)\\) adalah …", o: ["\\(\\frac{1}{2\\sqrt{t}}\\)", "\\(2\\sqrt{t}\\)", "\\(\\frac{1}{\\sqrt{t}}\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=\\frac{1}{x^2}\\) adalah …", o: ["\\(-2/x^3\\)", "\\(2/x^3\\)", "\\(-1/x^3\\)"], a: 0 },
+        { t: "Jika \\(v(t)=t^{-1}\\), maka percepatan \\(a(t)\\) adalah …", o: ["\\(-t^{-2}\\)", "\\(t^{-2}\\)", "\\(-t\\)"], a: 0 },
+        { t: "Nilai \\(f'(1)\\) jika \\(f(x)=2x^3\\) adalah …", o: ["6", "2", "3"], a: 0 },
+        { t: "Gradien garis singgung \\(y=\\frac{1}{x}\\) di \\(x=1\\) adalah …", o: ["-1", "1", "0"], a: 0 }
+    ],
+    "12.7": [
+        { t: "Posisi \\(s(t)=t^3-6t^2+9t\\). Kecepatan nol saat \\(t\\) sama dengan …", o: ["1 dan 3", "0 dan 2", "2 dan 4"], a: 0 },
+        { t: "Percepatan \\(a(t)=6t-12\\). Percepatan nol saat \\(t\\) sama dengan …", o: ["2", "3", "1"], a: 0 },
+        { t: "Garis singgung \\(y=x^3-3x\\) di \\(x=2\\) adalah …", o: ["\\(y=9x-16\\)", "\\(y=9x+16\\)", "\\(y=3x-4\\)"], a: 0 },
+        { t: "Turunan dari \\(f(x)=3x^2-12x\\) adalah …", o: ["\\(6x-12\\)", "\\(3x-12\\)", "\\(6x-12x\\)"], a: 0 },
+        { t: "Jika \\(f(x)=3x^2-12x\\), maka \\(f'(x)=0\\) saat \\(x\\) sama dengan …", o: ["2", "4", "3"], a: 0 },
+        { t: "Posisi \\(s(t)=t^3-3t^2\\). Kecepatan nol saat \\(t\\) sama dengan …", o: ["0 dan 2", "1 dan 3", "2 dan 4"], a: 0 },
+        { t: "Turunan dari \\(f(x)=x^4-4x^2\\) adalah …", o: ["\\(4x^3-8x\\)", "\\(4x^3-4x\\)", "\\(x^3-8x\\)"], a: 0 },
+        { t: "Gradien garis singgung \\(y=x^2-4x\\) di \\(x=2\\) adalah …", o: ["0", "4", "-4"], a: 0 },
+        { t: "Nilai \\(f'(2)\\) jika \\(f(x)=2x^3-3x^2\\) adalah …", o: ["12", "10", "8"], a: 0 },
+        { t: "Posisi \\(s(t)=2t^2-8t\\). Kecepatan minimum terjadi saat \\(t\\) sama dengan …", o: ["2", "4", "0"], a: 0 }
+    ]
+};
+
+function renderQuizForClass() {
+    const container = $('#quizContainer');
+    const label = $('#quizKelasLabel');
+    const intro = $('#quizIntro');
+    if (!state.kelas) {
+        container.innerHTML = '<p>Pilih kelas terlebih dahulu di slide awal.</p>';
+        label.textContent = '—';
+        return;
+    }
+    label.textContent = state.kelas;
+    if (state.nama) {
+        intro.innerHTML = `Halo <strong>${escapeHtml(state.nama)}</strong>! Soal berikut disesuaikan dengan kelas <strong>${state.kelas}</strong>. Terdapat 10 soal untuk kamu kerjakan.`;
+    } else {
+        intro.innerHTML = `Soal berikut disesuaikan dengan kelas <strong>${state.kelas}</strong>. Terdapat 10 soal untuk kamu kerjakan.`;
+    }
+
+    const soal = bankSoal[state.kelas] || bankSoal["12.1"];
+    state.quizAnswered = new Set();
+    $('#quizResult').textContent = '';
+
+    container.innerHTML = soal.map((q, qi) => `
+        <div class="quiz-block" data-qi="${qi}">
+            <div class="q-text">${qi + 1}. ${q.t}</div>
+            <div class="quiz-options">
+                ${q.o.map((opt, oi) => `
+                    <button class="quiz-opt" data-oi="${oi}" data-correct="${oi === q.a ? '1' : '0'}">${opt}</button>
+                `).join('')}
+            </div>
+            <div class="quiz-feedback"></div>
+        </div>
+    `).join('');
+
+    typesetMath(container);
+
+    $$('.quiz-block', container).forEach((block, qi) => {
+        const opts = $$('.quiz-opt', block);
+        const fb = $('.quiz-feedback', block);
+        opts.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (state.quizAnswered.has(qi)) return;
+                state.quizAnswered.add(qi);
+                opts.forEach(o => o.disabled = true);
+                const isCorrect = opt.dataset.correct === '1';
+                opt.classList.add(isCorrect ? 'correct' : 'wrong');
+                if (!isCorrect) {
+                    opts.find(o => o.dataset.correct === '1')?.classList.add('correct');
+                }
+                fb.textContent = isCorrect ? '✅ Benar!' : '❌ Belum tepat. Lihat jawaban yang benar.';
+                fb.className = 'quiz-feedback ' + (isCorrect ? 'ok' : 'no');
+            });
+        });
+    });
+}
+
+function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
+function initQuiz() {
+    $('#btnCheckQuiz').addEventListener('click', () => {
+        const blocks = $$('.quiz-block', $('#quizContainer'));
+        const total = blocks.length;
+        const answered = state.quizAnswered.size;
+        const resultEl = $('#quizResult');
+        if (answered < total) {
+            resultEl.textContent = `Masih ada ${total - answered} soal yang belum dijawab.`;
+            resultEl.style.color = 'var(--accent)';
+            return;
+        }
+        let correct = 0;
+        blocks.forEach(block => {
+            const chosen = $$('.quiz-opt', block).find(o =>
+                o.classList.contains('correct') || o.classList.contains('wrong')
+            );
+            if (chosen && chosen.dataset.correct === '1') correct++;
+        });
+        resultEl.textContent = `Skor: ${correct}/${total}. ${correct === total ? 'Luar biasa! 🎉' : 'Terus berlatih! 💪'}`;
+        resultEl.style.color = correct === total ? 'var(--success)' : 'var(--danger)';
+    });
+
+    $('#btnResetQuiz').addEventListener('click', renderQuizForClass);
+}
+
+/* ============================================================
+   ASESMEN AWAL (statis)
+   ============================================================ */
+function initPretest() {
+    $$('.slide[data-slide="2"] .quiz-block').forEach(block => {
+        const opts = $$('.quiz-opt', block);
+        const fb = $('.quiz-feedback', block);
+        opts.forEach(opt => {
+            opt.addEventListener('click', () => {
+                opts.forEach(o => o.disabled = true);
+                const correct = opt.dataset.ans === '1';
+                opt.classList.add(correct ? 'correct' : 'wrong');
+                if (!correct) opts.find(o => o.dataset.ans === '1')?.classList.add('correct');
+                fb.textContent = correct ? '✅ Tepat.' : '❌ Jawaban benar telah ditandai.';
+                fb.className = 'quiz-feedback ' + (correct ? 'ok' : 'no');
+            });
+        });
+    });
+}
+
+/* ============================================================
+   INISIALISASI
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    initClassSelection();
+    initNav();
+    initKinematicsLab();
+    initTangentLab();
+    initPretest();
+    initQuiz();
+    updateProgress();
+    showSlide(0);
+
+    typesetMath($('.slide.active'));
+});
+</script>
+</body>
+</html>
